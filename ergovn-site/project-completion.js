@@ -67,12 +67,10 @@
   ];
 
   function photoMarkup(photo, index, projectName) {
-    const [name, detail, src] = photo;
+    const [name, , src] = photo;
     return `
       <div class="completion-photo${src ? " has-image" : ""}">
         ${src ? `<img src="${src}" alt="${projectName} — ${name}" loading="lazy">` : ""}
-        <span class="completion-index">${String(index + 1).padStart(2, "0")}</span>
-        <p class="completion-caption">${name} / ${detail}</p>
       </div>`;
   }
 
@@ -155,3 +153,4 @@
   const observer = new MutationObserver(initialiseEnhancements);
   observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
+
