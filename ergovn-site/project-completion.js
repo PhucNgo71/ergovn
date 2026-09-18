@@ -157,7 +157,7 @@
     const image = link?.querySelector("img");
     if (!image) return false;
 
-    const replacement = "/images/hay-result-chair-oak.jpg";
+    const replacement = "/images/hay-chair-family.jpg";
     if (image.getAttribute("src") !== replacement) image.setAttribute("src", replacement);
     return true;
   }
