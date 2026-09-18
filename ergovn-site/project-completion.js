@@ -138,6 +138,20 @@
     return true;
   }
 
+  function updateWilkhahnReference() {
+    const link = document.querySelector('.project-reference[href*="wilkhahn.com"]');
+    const image = link?.querySelector("img");
+    if (!image) return false;
+
+    const replacement = "/images/wilkhahn-graph-dark-brown.jpg";
+    if (image.getAttribute("src") !== replacement) image.setAttribute("src", replacement);
+    const title = link.querySelector("strong");
+    if (title && title.textContent !== "High End Conference") {
+      title.textContent = "High End Conference";
+    }
+    return true;
+  }
+
   function mount() {
     const projectsSection = document.querySelector("#projects.projects");
     if (!projectsSection || projectsSection.querySelector(".project-completion")) return false;
@@ -203,6 +217,7 @@
   function initialiseEnhancements() {
     mount();
     updateFooterNote();
+    updateWilkhahnReference();
   }
 
   initialiseEnhancements();
