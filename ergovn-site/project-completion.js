@@ -152,6 +152,16 @@
     return true;
   }
 
+  function updateHayReference() {
+    const link = document.querySelector('.project-reference[href*="hay.com"]');
+    const image = link?.querySelector("img");
+    if (!image) return false;
+
+    const replacement = "/images/hay-result-chair-oak.jpg";
+    if (image.getAttribute("src") !== replacement) image.setAttribute("src", replacement);
+    return true;
+  }
+
   function mount() {
     const projectsSection = document.querySelector("#projects.projects");
     if (!projectsSection || projectsSection.querySelector(".project-completion")) return false;
@@ -218,6 +228,7 @@
     mount();
     updateFooterNote();
     updateWilkhahnReference();
+    updateHayReference();
   }
 
   initialiseEnhancements();
