@@ -69,9 +69,50 @@
   function photoMarkup(photo, index, projectName) {
     const [name, , src] = photo;
     return `
-      <div class="completion-photo${src ? " has-image" : ""}">
+      <div class="completion-photo${src ? " has-image" : ""}"${src ? ` role="button" tabindex="0" data-lightbox-src="${src}" data-lightbox-alt="${projectName} — ${name}" aria-label="View ${projectName} — ${name} large"` : ""}>
         ${src ? `<img src="${src}" alt="${projectName} — ${name}" loading="lazy">` : ""}
       </div>`;
+  }
+
+  function createLightbox() {
+    const lightbox = document.createElement("div");
+    lightbox.className = "completion-lightbox";
+    lightbox.hidden = true;
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.innerHTML = `
+      <button class="completion-lightbox-backdrop" type="button" aria-label="Close large photo"></button>
+      <figure class="completion-lightbox-frame">
+        <img src="" alt="">
+        <figcaption></figcaption>
+      </figure>
+      <button class="completion-lightbox-close" type="button">Close</button>`;
+    document.body.appendChild(lightbox);
+
+    const image = lightbox.querySelector("img");
+    const caption = lightbox.querySelector("figcaption");
+    const closeButton = lightbox.querySelector(".completion-lightbox-close");
+
+    function close() {
+      lightbox.hidden = true;
+      image.removeAttribute("src");
+      document.body.classList.remove("completion-lightbox-open");
+    }
+
+    lightbox.querySelector(".completion-lightbox-backdrop").addEventListener("click", close);
+    closeButton.addEventListener("click", close);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !lightbox.hidden) close();
+    });
+
+    return (src, alt) => {
+      image.src = src;
+      image.alt = alt;
+      caption.textContent = alt;
+      lightbox.hidden = false;
+      document.body.classList.add("completion-lightbox-open");
+      closeButton.focus();
+    };
   }
 
   function paneMarkup(project, index) {
@@ -117,7 +158,15 @@
       </div>
       ${projects.map(paneMarkup).join("")}`;
 
+    const openLightbox = createLightbox();
+
     completion.addEventListener("click", (event) => {
+      const photo = event.target.closest(".completion-photo.has-image");
+      if (photo) {
+        openLightbox(photo.dataset.lightboxSrc, photo.dataset.lightboxAlt);
+        return;
+      }
+
       const tab = event.target.closest(".completion-tab");
       if (!tab) return;
 
@@ -127,6 +176,14 @@
       completion.querySelectorAll(".completion-pane").forEach((pane) => {
         pane.hidden = pane.id !== tab.getAttribute("aria-controls");
       });
+    });
+
+    completion.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const photo = event.target.closest(".completion-photo.has-image");
+      if (!photo) return;
+      event.preventDefault();
+      openLightbox(photo.dataset.lightboxSrc, photo.dataset.lightboxAlt);
     });
 
     projectsSection.classList.add("project-completion-layout");
