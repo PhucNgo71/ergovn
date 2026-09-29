@@ -138,6 +138,33 @@
     return true;
   }
 
+  function updateSocialLinks() {
+    const footer = document.querySelector(".footer");
+    if (!footer) return false;
+
+    let socialLinks = footer.querySelector(".footer-social");
+    if (!socialLinks) {
+      socialLinks = document.createElement("nav");
+      socialLinks.className = "footer-social";
+      socialLinks.setAttribute("aria-label", "Ergovn social media");
+      footer.appendChild(socialLinks);
+    }
+
+    socialLinks.innerHTML = `
+      <a href="https://www.linkedin.com/company/the-first-workshop-tfw/?viewAsMember=true" target="_blank" rel="noopener noreferrer" aria-label="Ergovn on LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <path d="M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 0 0-4 0"></path>
+        </svg>
+      </a>
+      <a href="https://www.facebook.com/Ergovn?mibextid=wwXIfr&amp;rdid=xIo32yy8VsKstern&amp;share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1C7AXNXr7g%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Ergovn on Facebook" title="Facebook">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+        </svg>
+      </a>`;
+    return true;
+  }
+
   function updateWilkhahnReference() {
     const link = document.querySelector('.project-reference[href*="wilkhahn.com"]');
     const image = link?.querySelector("img");
@@ -227,6 +254,7 @@
   function initialiseEnhancements() {
     mount();
     updateFooterNote();
+    updateSocialLinks();
     updateWilkhahnReference();
     updateHayReference();
   }
