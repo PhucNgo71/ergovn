@@ -33,6 +33,22 @@
       ],
     },
     {
+      id: "one-tech-stop-da-nang",
+      name: "One Tech Stop (DN)",
+      scope: "Loose Furniture / Framery Phonebooth",
+      partner: "Ergovn project delivery",
+      thirdLabel: "Location",
+      thirdValue: "Da Nang",
+      photos: [
+        ["Framery phonebooths", "Hero / full phonebooth setting", "/project-photos/ots-da-nang/web/01-hero.jpg"],
+        ["Training room", "Loose furniture setting", "/project-photos/ots-da-nang/web/02-training-room.jpg"],
+        ["Lounge", "Modular seating", "/project-photos/ots-da-nang/web/03-lounge.jpg"],
+        ["Framery phonebooth", "Focus setting", "/project-photos/ots-da-nang/web/04-framery-phonebooth.jpg"],
+        ["Lounge", "Sofa detail", "/project-photos/ots-da-nang/web/05-sofa-detail.jpg"],
+        ["Cafe seating", "Collaborative setting", "/project-photos/ots-da-nang/web/06-cafe-seating.jpg"],
+      ],
+    },
+    {
       id: "sky-mavis",
       name: "Sky Mavis",
       scope: "System Furniture / Meeting Room / Glass Partition",
@@ -267,4 +283,3 @@
     socialObserver.observe(document.documentElement, { childList: true, subtree: true });
   }
 })();
-
