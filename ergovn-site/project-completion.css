@@ -231,7 +231,8 @@
   text-transform: uppercase;
 }
 
-body.completion-lightbox-open {
+body.completion-lightbox-open,
+body.maker-popup-open {
   overflow: hidden;
 }
 
@@ -315,7 +316,7 @@ body.completion-lightbox-open {
 @media (max-width: 560px) {
   .completion-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: auto repeat(3, 118px);
+    grid-template-rows: auto auto repeat(3, 118px);
   }
 
   .completion-photo:first-child {
@@ -343,4 +344,3 @@ body.completion-lightbox-open {
     height: min(84vh, 760px);
   }
 }
-

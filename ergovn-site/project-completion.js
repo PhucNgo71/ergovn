@@ -90,6 +90,53 @@
       </div>`;
   }
 
+  function containDialogFocus(dialog, onClose, returnTo = document.activeElement) {
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusableElements = () => [...dialog.querySelectorAll(focusableSelector)]
+      .filter((element) => element.getClientRects().length > 0);
+    const focusFirst = () => focusableElements()[0]?.focus({ preventScroll: true });
+
+    function handleKeydown(event) {
+      if (!dialog.isConnected || dialog.hidden) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const elements = focusableElements();
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      const active = document.activeElement;
+      if (!first) {
+        event.preventDefault();
+        return;
+      }
+      if (!dialog.contains(active) || (event.shiftKey ? active === first : active === last)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus({ preventScroll: true });
+      }
+    }
+
+    function handleFocus(event) {
+      if (dialog.isConnected && !dialog.hidden && !dialog.contains(event.target)) focusFirst();
+    }
+
+    document.addEventListener("keydown", handleKeydown, true);
+    document.addEventListener("focusin", handleFocus);
+    (dialog.querySelector('.completion-lightbox-close, .maker-popup-close') || focusableElements()[0])
+      ?.focus({ preventScroll: true });
+
+    return () => {
+      document.removeEventListener("keydown", handleKeydown, true);
+      document.removeEventListener("focusin", handleFocus);
+      if (returnTo?.isConnected && returnTo.getClientRects().length > 0) {
+        returnTo.focus({ preventScroll: true });
+      }
+    };
+  }
+
   function createLightbox() {
     const lightbox = document.createElement("div");
     lightbox.className = "completion-lightbox";
@@ -99,7 +146,7 @@
     lightbox.innerHTML = `
       <button class="completion-lightbox-backdrop" type="button" aria-label="Close large photo"></button>
       <figure class="completion-lightbox-frame">
-        <img src="" alt="">
+        <img alt="">
         <figcaption></figcaption>
       </figure>
       <button class="completion-lightbox-close" type="button">Close</button>`;
@@ -108,27 +155,53 @@
     const image = lightbox.querySelector("img");
     const caption = lightbox.querySelector("figcaption");
     const closeButton = lightbox.querySelector(".completion-lightbox-close");
+    let releaseFocus;
 
     function close() {
       lightbox.hidden = true;
       image.removeAttribute("src");
       document.body.classList.remove("completion-lightbox-open");
+      releaseFocus?.();
+      releaseFocus = undefined;
     }
 
     lightbox.querySelector(".completion-lightbox-backdrop").addEventListener("click", close);
     closeButton.addEventListener("click", close);
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !lightbox.hidden) close();
-    });
-
-    return (src, alt) => {
+    return (src, alt, trigger) => {
       image.src = src;
       image.alt = alt;
       caption.textContent = alt;
+      lightbox.setAttribute("aria-label", alt);
       lightbox.hidden = false;
       document.body.classList.add("completion-lightbox-open");
-      closeButton.focus();
+      releaseFocus = containDialogFocus(lightbox, close, trigger);
     };
+  }
+
+  let makerDialog;
+  let releaseMakerFocus;
+
+  function updateMakerDialog() {
+    const dialog = document.querySelector(".maker-popup");
+    if (dialog === makerDialog) return;
+    releaseMakerFocus?.();
+    releaseMakerFocus = undefined;
+    makerDialog = dialog;
+    document.body.classList.toggle("maker-popup-open", Boolean(dialog));
+    if (dialog) {
+      releaseMakerFocus = containDialogFocus(dialog, () => {
+        dialog.querySelector(".maker-popup-close")?.click();
+      });
+    }
+  }
+
+  function updateDocumentLanguage() {
+    const selected = document.querySelector(".locale button.active");
+    if (!selected) return;
+    const language = selected.textContent.trim().toLowerCase();
+    if ((language === "en" || language === "vi") && document.documentElement.lang !== language) {
+      document.documentElement.lang = language;
+    }
   }
 
   function paneMarkup(project, index) {
@@ -227,7 +300,7 @@
     completion.addEventListener("click", (event) => {
       const photo = event.target.closest(".completion-photo.has-image");
       if (photo) {
-        openLightbox(photo.dataset.lightboxSrc, photo.dataset.lightboxAlt);
+        openLightbox(photo.dataset.lightboxSrc, photo.dataset.lightboxAlt, photo);
         return;
       }
 
@@ -247,7 +320,7 @@
       const photo = event.target.closest(".completion-photo.has-image");
       if (!photo) return;
       event.preventDefault();
-      openLightbox(photo.dataset.lightboxSrc, photo.dataset.lightboxAlt);
+      openLightbox(photo.dataset.lightboxSrc, photo.dataset.lightboxAlt, photo);
     });
 
     projectsSection.classList.add("project-completion-layout");
@@ -269,6 +342,8 @@
     updateFooterNote();
     updateWilkhahnReference();
     updateHayReference();
+    updateMakerDialog();
+    updateDocumentLanguage();
   }
 
   initialiseEnhancements();
