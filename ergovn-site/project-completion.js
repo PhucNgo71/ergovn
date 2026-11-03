@@ -260,8 +260,8 @@
       form.insertBefore(notice, submit);
     }
     const copy = vietnamese
-      ? "Ergovn sử dụng thông tin bạn cung cấp để phản hồi yêu cầu. Xem "
-      : "Ergovn uses the information you provide to respond to your inquiry. Read our ";
+      ? "Bạn có quyền không đồng ý chia sẻ thông tin. Nếu không đồng ý, Ergovn sẽ không xử lý yêu cầu qua biểu mẫu này. Khi tích ô đồng ý và bấm gửi, bạn xác nhận đồng ý chia sẻ thông tin đã cung cấp để Ergovn sử dụng nhằm xử lý và phản hồi yêu cầu của bạn. Việc chỉ nhập thông tin chưa được xem là đồng ý. Xem "
+      : "You have the right not to share your information. If you do not agree, Ergovn will not process your request through this form. By ticking the consent box and sending the form, you agree to share the details you provide for Ergovn to use to process and respond to your request. Typing information alone does not indicate consent. Read our ";
     if (notice.firstChild.textContent !== copy) notice.firstChild.textContent = copy;
     const link = notice.querySelector("a");
     if (link.getAttribute("href") !== href) link.setAttribute("href", href);
