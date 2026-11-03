@@ -227,6 +227,87 @@
     return true;
   }
 
+  function updatePrivacyLinks() {
+    const vietnamese = document.documentElement.lang === "vi";
+    const label = vietnamese ? "Chính sách bảo mật" : "Privacy Policy";
+    const href = `/privacy-policy/${vietnamese ? "?lang=vi" : ""}`;
+    const footer = document.querySelector(".footer > div:first-child");
+    if (footer) {
+      let link = footer.querySelector(".footer-privacy");
+      if (!link) {
+        link = document.createElement("a");
+        link.className = "footer-privacy";
+        footer.appendChild(link);
+      }
+      if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+      if (link.textContent !== label) link.textContent = label;
+    }
+
+    const form = document.querySelector(".inquiry-form");
+    const submit = form?.querySelector('button[type="submit"]');
+    if (!submit) return;
+    let notice = form.querySelector(".inquiry-privacy");
+    if (!notice) {
+      notice = document.createElement("p");
+      notice.className = "inquiry-privacy";
+      notice.id = "inquiry-privacy-notice";
+      const copy = document.createElement("span");
+      const link = document.createElement("a");
+      // Keep the inquiry in place while the visitor reads the policy.
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      notice.append(copy, link);
+      form.insertBefore(notice, submit);
+    }
+    const copy = vietnamese
+      ? "Ergovn sử dụng thông tin bạn cung cấp để phản hồi yêu cầu. Xem "
+      : "Ergovn uses the information you provide to respond to your inquiry. Read our ";
+    if (notice.firstChild.textContent !== copy) notice.firstChild.textContent = copy;
+    const link = notice.querySelector("a");
+    if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+    if (link.textContent !== label) link.textContent = label;
+    const accessibleLabel = `${label} (${vietnamese ? "mở trong thẻ mới" : "opens in a new tab"})`;
+    if (link.getAttribute("aria-label") !== accessibleLabel) link.setAttribute("aria-label", accessibleLabel);
+    const describedBy = (submit.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+    if (!describedBy.includes(notice.id)) {
+      submit.setAttribute("aria-describedby", [...describedBy, notice.id].join(" "));
+    }
+
+    let consent = form.querySelector(".inquiry-consent");
+    if (!consent) {
+      consent = document.createElement("fieldset");
+      consent.className = "inquiry-consent";
+      const question = document.createElement("legend");
+      const choice = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.name = "privacy_consent";
+      checkbox.required = true;
+      checkbox.autocomplete = "off";
+      checkbox.setAttribute("aria-describedby", notice.id);
+      const answer = document.createElement("span");
+      choice.append(checkbox, answer);
+      const version = document.createElement("input");
+      version.type = "hidden";
+      version.name = "privacy_policy_version";
+      version.value = "2026-11-03";
+      consent.append(question, choice, version);
+      form.insertBefore(consent, submit);
+    }
+    const question = vietnamese
+      ? "Bạn có đồng ý chia sẻ thông tin để Ergovn phản hồi yêu cầu không? (bắt buộc)"
+      : "Do you agree to share your details so Ergovn can respond? (required)";
+    const answer = vietnamese
+      ? "Tôi đồng ý chia sẻ họ tên, công ty, loại dự án và email để Ergovn xử lý và phản hồi yêu cầu theo Chính sách bảo mật."
+      : "I agree to share my name, company, project type and email for Ergovn to process and respond to my inquiry as described in the Privacy Policy.";
+    const legend = consent.querySelector("legend");
+    const answerText = consent.querySelector("span");
+    if (legend.textContent !== question) legend.textContent = question;
+    if (answerText.textContent !== answer) answerText.textContent = answer;
+    const checkbox = consent.querySelector('input[type="checkbox"]');
+    if (checkbox.value !== answer) checkbox.value = answer;
+  }
+
   function mountSocialLinks() {
     const contactBlock = document.querySelector(".footer > div:nth-child(2)");
     if (!contactBlock) return false;
@@ -344,6 +425,7 @@
     updateHayReference();
     updateMakerDialog();
     updateDocumentLanguage();
+    updatePrivacyLinks();
   }
 
   initialiseEnhancements();
